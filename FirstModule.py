@@ -23,9 +23,9 @@ pygame.display.set_icon(icon)
 
 # Background Sound
 
-mixer.music.load("Tetris.mp3")
-mixer.music.set_volume(0.15)
-mixer.music.play(-1)
+#mixer.music.load("Tetris.mp3")
+#mixer.music.set_volume(0.15)
+#mixer.music.play(-1)
 
 # Font
 
@@ -35,21 +35,22 @@ font = pygame.font.SysFont("arial", 25)
 over_font = pygame.font.SysFont("arial", 50)
 
 # Global variables
-x1 = 0
-x2 = 0
-y1 = 0
-y2 = 0
-x11 = 393
-x22 = 394
-y11 = 125
-y22 = 126
+grid = [0] * 10 * 20
+deepskyblue = (0,191,255)
+mediumblue = (0,0,205)
+darkorange = (255,140,0)
+yellow = (255,255,0)
+lawngreen = (124,252,0)
+red = (255,0,0)
+purple = (128,0,128)
+
+width, column, row = 300, 10, 20
+gap = width // column
+height = gap * row
+color = [deepskyblue, mediumblue, darkorange, yellow, lawngreen, red, purple]
+yy=0
 
 # Funktionen
-
-def blocks(x1, y1, x2, y2): 
-    pygame.draw.rect(screen, (0, 0, 0), (x1, y1, 15, 15), 2)
-    pygame.draw.rect(screen, (240, 0, 0), (x2, y2, 14, 14))
-
 
 def show_score(x, y):
     screen.blit(font.render("Score : " + str(score_value), True, (0, 0, 0)), (x, y))
@@ -89,8 +90,7 @@ while run:
     # make sure the character can not move off the screen 
     
     if keys[pygame.K_DOWN]:
-        y11 += 5
-        y22 += 5
+        yy += 1
         
     if keys[pygame.K_LEFT]:
         x11 -= 5
@@ -104,7 +104,7 @@ while run:
     screen.fill((241, 241, 241))
     
     # field 
-    pygame.draw.rect(screen, (0, 0, 0), (250, 100, 300, 600), 3)
+    pygame.draw.rect(screen, (0, 0, 0), (245, 95, width+10, height+10), 3)
     
     # show rectangle that contains the next block
     show_next_block()
@@ -112,9 +112,18 @@ while run:
     show_score(80, 50)
     # game over text
     game_over_text()
-    
-    # falling block
-    blocks(x11, y11, x22, y22)
+
+    grid[yy] = 1;
+
+    #test
+    for n, colornumber in enumerate(grid):
+        if colornumber > 0:
+            x = n % column * gap +250
+            y = n // column * gap +100
+            pygame.draw.rect(screen, (0, 0, 0), (x, y, gap, gap))
+            pygame.draw.rect(screen, color[colornumber], (x+1, y+1, gap-2, gap-2))
+
+
 
     # update screen
 
