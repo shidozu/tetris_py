@@ -5,11 +5,13 @@ Created on 17.09.2020
 '''
 
 import pygame
+import random
 from pygame import mixer
 
 # Initialize pygame
 
 pygame.init()
+
 
 # Create a window of 800 width, 750 heigth
 
@@ -34,23 +36,63 @@ font = pygame.font.SysFont("arial", 25)
 
 over_font = pygame.font.SysFont("arial", 50)
 
-# Global variables
+# Tetromino
+
+I = [[0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
+     [0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
+     [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0]]
+
+O = [[0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0]]
+
+S = [[0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0],
+     [0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0, 0]]
+
+Z = [[0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0],
+     [0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0, 0]]
+
+J = [[0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0],
+     [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0]]
+
+L = [[0, 0, 0, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 3, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 3, 0, 0, 0],
+     [0, 0, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0]]
+
+T = [[0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 7, 0, 0, 0, 0, 0],
+     [0, 0, 0, 0, 0, 7, 0, 0, 0, 7, 7, 0, 0, 7, 0, 0],
+     [0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0, 7, 0, 0],
+     [0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 0, 0, 0, 7, 0, 0]]
+
+Tetromino = [I, O, S, Z, J, L, T]
+
+# Color
 grid = [0] * 10 * 20
-deepskyblue = (0,191,255)
-mediumblue = (0,0,205)
+deepskyblue = (0,0,205)
+mediumblue =  (0,191,255)
 darkorange = (255,140,0)
 yellow = (255,255,0)
 lawngreen = (124,252,0)
 red = (255,0,0)
 purple = (128,0,128)
 
+# Variable
 width, column, row = 300, 10, 20
 gap = width // column
 height = gap * row
-color = [deepskyblue, mediumblue, darkorange, yellow, lawngreen, red, purple]
+color = [(0,0,0), deepskyblue, mediumblue, darkorange, yellow, lawngreen, red, purple]
 yy=0
 
-# Funktionen
+# Function
 
 def show_score(x, y):
     screen.blit(font.render("Score : " + str(score_value), True, (0, 0, 0)), (x, y))
@@ -64,6 +106,13 @@ def show_next_block():
     
 def game_over_text():
     screen.blit(over_font.render("Game over!", True, (0, 0, 0)), (270, 30))
+
+def getNewTetromino():
+    randomTetromino = random.choice(Tetromino)
+    print(randomTetromino)
+    return randomTetromino
+
+
 
 
 # game-loop
@@ -113,13 +162,15 @@ while run:
     # game over text
     game_over_text()
 
-    grid[yy] = 1;
 
-    #test
-    for n, colornumber in enumerate(grid):
+
+    # test
+    fallingTetromino = getNewTetromino()
+
+    for n, colornumber in enumerate(fallingTetromino[yy]):
         if colornumber > 0:
-            x = n % column * gap +250
-            y = n // column * gap +100
+            x = n % 4 * gap +250
+            y = n // 4 * gap +100
             pygame.draw.rect(screen, (0, 0, 0), (x, y, gap, gap))
             pygame.draw.rect(screen, color[colornumber], (x+1, y+1, gap-2, gap-2))
 
