@@ -115,7 +115,7 @@ def show_score(x, y):
 
 # show next block
 def show_next_block():
-    pygame.draw.rect(screen, (0, 0, 0), (575, 100, 100, 100), 3)
+    pygame.draw.rect(screen, (0, 0, 0), (575, 100, gap*4+10, gap*4+10), 3)
     screen.blit(font.render("Next", True, (0, 0, 0)), (600, 60))
 
 # show game over text
@@ -146,6 +146,9 @@ def validity(tetXoff, tetYoff):
     return True
 
 # get randrom tetromino
+
+
+next_tetromino = get_new_tetromino()
 falling_tetromino = get_new_tetromino()
 
 # game-loop
@@ -177,7 +180,8 @@ while run:
             # press button 2 to generate new tetro with check
             if event.key == pygame.K_2:
                 saveold_tetromino = falling_tetromino
-                falling_tetromino = get_new_tetromino()
+                falling_tetromino = next_tetromino
+                next_tetromino =  get_new_tetromino()
                 if not validity(tetX, tetY):
                     falling_tetromino = saveold_tetromino
             # press button up to rotate
@@ -216,6 +220,14 @@ while run:
     show_score(80, 50)
     # game over text
     game_over_text()
+    #forecast tetromino
+    for n, colornumber in enumerate(next_tetromino[0]):
+        if colornumber > 0:
+            x = n % 4 * gap + 580
+            y = n // 4 * gap + 105
+            pygame.draw.rect(screen, (0, 0, 0), (x, y, gap, gap))
+            pygame.draw.rect(screen, color[colornumber], (x+1, y+1, gap-2, gap-2))
+
     # draw falling tetromino
     for n, colornumber in enumerate(falling_tetromino[yy]):
         if colornumber > 0:
