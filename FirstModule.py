@@ -173,8 +173,9 @@ def main():
     yy = 0
     tet_x = 3
     tet_y = 0
+    speed = 1000
     tetromino_down = pygame.USEREVENT + 1
-    pygame.time.set_timer(tetromino_down, 1000)
+    pygame.time.set_timer(tetromino_down, speed)
     pygame.key.set_repeat(1, 100)
     number_of_lines = 0
     # get randrom tetromino
@@ -216,6 +217,8 @@ def main():
                         if delete_line(grid, COLUMN):
                             number_of_lines += 1
                             score_value += 10
+                            speed -= 100
+                            pygame.time.set_timer(tetromino_down, speed)
 
                     if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0 and not game_over_bool:
                         game_over_bool = True
@@ -245,6 +248,12 @@ def main():
                 if event.key == pygame.K_DOWN and not game_over_bool:
                     if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
                         tet_y += 1
+
+                if event.key == pygame.K_m:
+                    if mixer.music.get_volume() > 0:
+                        mixer.music.set_volume(0)
+                    else:
+                        mixer.music.set_volume(0.15)
 
         # Background color
         screen.fill((241, 241, 241))
