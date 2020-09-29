@@ -20,7 +20,7 @@ def show_score(screen, font, score_value, x, y):
 # show time
 def show_time(screen, font, running_time, x, y):
     minutes = str(running_time // 60000).zfill(2)
-    seconds = str(int(running_time // 1000)).zfill(2)
+    seconds = str(int(running_time % 60000//1000)).zfill(2)
     screen.blit(font.render("Zeit : " + str(minutes) + ":" + str(seconds), True, (0, 0, 0)), (x, y))
 
 
@@ -173,7 +173,7 @@ def main():
     yy = 0
     tet_x = 3
     tet_y = 0
-    speed = 1000
+    speed = 900
     tetromino_down = pygame.USEREVENT + 1
     pygame.time.set_timer(tetromino_down, speed)
     pygame.key.set_repeat(1, 100)
@@ -190,7 +190,8 @@ def main():
     clock = pygame.time.Clock()
     start_time = pygame.time.get_ticks()
     while run:
-        counting_time = pygame.time.get_ticks() - start_time
+        if not game_over_bool:
+            counting_time = pygame.time.get_ticks() - start_time
         # loop through a list of any keyboard or mouse events
 
         for event in pygame.event.get():
@@ -214,11 +215,7 @@ def main():
 
                         falling_tetromino = next_tetromino
                         next_tetromino = get_new_tetromino(all_tetromino)
-                        if delete_line(grid, COLUMN):
-                            number_of_lines += 1
-                            score_value += 10
-                            speed -= 100
-                            pygame.time.set_timer(tetromino_down, speed)
+                        pygame.time.set_timer(tetromino_down, speed)
 
                     if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0 and not game_over_bool:
                         game_over_bool = True
@@ -257,6 +254,11 @@ def main():
 
         # Background color
         screen.fill((241, 241, 241))
+
+        if delete_line(grid, COLUMN):
+            number_of_lines += 1
+            score_value += 10
+            speed -= 100
 
         # field
         pygame.draw.rect(screen, (0, 0, 0), (245, 95, WIDTH+10, height+10), 3)
