@@ -172,6 +172,7 @@ def main():
 
     next_tetromino = get_new_tetromino(all_tetromino)
     falling_tetromino = get_new_tetromino(all_tetromino)
+    game_over_bool = False
 
     # game-loop
 
@@ -193,29 +194,23 @@ def main():
                 if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
                     tet_y += 1
                 else:
-                    tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
-                    tet_x = 3
-                    tet_y = 0
+                    if not game_over_bool:
+                        tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
+                        tet_x = 3
+                        tet_y = 0
 
-                    falling_tetromino = next_tetromino
-                    next_tetromino = get_new_tetromino(all_tetromino)
-                    delete_line(grid, COLUMN)
+                        falling_tetromino = next_tetromino
+                        next_tetromino = get_new_tetromino(all_tetromino)
+                        delete_line(grid, COLUMN)
+
+                    if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0 and not game_over_bool:
+                        game_over_bool = True
+                        next_tetromino = falling_tetromino
 
             if event.type == pygame.KEYDOWN:
-                # press button 1 to put tetromino on grid
-                if event.key == pygame.K_1:
-                    tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
-                    tet_x = 3
-                    tet_y = 0
-                # press button 2 to generate new tetro with check
-                if event.key == pygame.K_2:
-                    saveold_tetromino = falling_tetromino
-                    falling_tetromino = next_tetromino
-                    next_tetromino = get_new_tetromino(all_tetromino)
-                    if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
-                        falling_tetromino = saveold_tetromino
+
                 # press button up to rotate
-                if event.key == pygame.K_UP:
+                if event.key == pygame.K_UP and not game_over_bool:
                     if yy >= 3:
                         yy = 0
                         if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
@@ -225,15 +220,15 @@ def main():
                         if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
                             yy -= 1
                 # press button left to slide left
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT and not game_over_bool:
                     if validity(falling_tetromino[yy], grid, tet_x - 1, tet_y, ROW, COLUMN):
                         tet_x -= 1
                 # press button right to slide right
-                if event.key == pygame.K_RIGHT:
+                if event.key == pygame.K_RIGHT and not game_over_bool:
                     if validity(falling_tetromino[yy], grid, tet_x + 1, tet_y, ROW, COLUMN):
                         tet_x += 1
                 # press button down to slide down
-                if event.key == pygame.K_DOWN:
+                if event.key == pygame.K_DOWN and not game_over_bool:
                     if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
                         tet_y += 1
 
@@ -250,13 +245,15 @@ def main():
         show_score(screen, font, score_value, 80, 50)
 
         # game over text
-        game_over_text(screen, over_font)
+        if game_over_bool:
+            game_over_text(screen, over_font)
 
         # forecast tetromino
         draw_struture(COLOR, screen, next_tetromino[0], gap, 4, 580, 105, 0, 0)
 
         # draw falling tetromino
-        draw_struture(COLOR, screen, falling_tetromino[yy], gap, 4, 250, 100, tet_x, tet_y)
+        if not game_over_bool:
+            draw_struture(COLOR, screen, falling_tetromino[yy], gap, 4, 250, 100, tet_x, tet_y)
 
         # draw field
         draw_struture(COLOR, screen, grid, gap, COLUMN, 250, 100, 0, 0)
@@ -264,8 +261,9 @@ def main():
         # update screen
         pygame.display.update()
 
-
     pygame.quit()
+
+
 # close game
 main()
 
