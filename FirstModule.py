@@ -64,6 +64,21 @@ def draw_struture(color, screen, struct, gaps, columns, off_x, off_y, tet_x, tet
             pygame.draw.rect(screen, color[color_number], (x+1, y+1, gaps-2, gaps-2))
 
 
+# delete full column
+def delete_line(grid, column):
+    ig = 0
+    for n in range(200):
+        x = n % column
+        if x == 0:
+            ig = 0
+        if grid[n] != 0:
+            ig += 1
+        if ig == 10:
+            del grid[n - 9:n + 1]
+            for nl in range(column):
+                grid.insert(0, 0)
+
+
 def main():
     # Initialize pygame
 
@@ -177,6 +192,14 @@ def main():
             if event.type == tetromino_down:
                 if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
                     tet_y += 1
+                else:
+                    tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
+                    tet_x = 3
+                    tet_y = 0
+
+                    falling_tetromino = next_tetromino
+                    next_tetromino = get_new_tetromino(all_tetromino)
+                    delete_line(grid, COLUMN)
 
             if event.type == pygame.KEYDOWN:
                 # press button 1 to put tetromino on grid
@@ -188,7 +211,7 @@ def main():
                 if event.key == pygame.K_2:
                     saveold_tetromino = falling_tetromino
                     falling_tetromino = next_tetromino
-                    next_tetromino =  get_new_tetromino(all_tetromino)
+                    next_tetromino = get_new_tetromino(all_tetromino)
                     if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
                         falling_tetromino = saveold_tetromino
                 # press button up to rotate
@@ -240,7 +263,11 @@ def main():
 
         # update screen
         pygame.display.update()
+
+
     pygame.quit()
 # close game
 main()
+
+
 
