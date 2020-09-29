@@ -17,6 +17,18 @@ def show_score(screen, font, score_value, x, y):
     screen.blit(font.render("Score : " + str(score_value), True, (0, 0, 0)), (x, y))
 
 
+# show time
+def show_time(screen, font, running_time, x, y):
+    minutes = str(running_time // 60000).zfill(2)
+    seconds = str(int(running_time // 1000)).zfill(2)
+    screen.blit(font.render("Zeit : " + str(minutes) + ":" + str(seconds), True, (0, 0, 0)), (x, y))
+
+
+# show number of cleared lines
+def show_number_lines(screen, font, lines, x, y):
+    screen.blit(font.render("Reihen: " + str(lines), True, (0, 0, 0)), (x, y))
+
+
 # show next block
 def show_next_block(screen, font, gap):
     pygame.draw.rect(screen, (0, 0, 0), (575, 100, gap*4+10, gap*4+10), 3)
@@ -77,73 +89,69 @@ def delete_line(grid, column):
             del grid[n - 9:n + 1]
             for nl in range(column):
                 grid.insert(0, 0)
+            return True
+    return False
 
 
 def main():
     # Initialize pygame
-
     pygame.init()
-    # Create a window of 800 width, 750 heigth
 
+    # Create a window of 800 width, 750 heigth
     screen = pygame.display.set_mode((800, 750))  # optional: RESIZEABLE
 
     # Title and Icon
-
     pygame.display.set_caption("Tetris")
     icon = pygame.image.load("tetris.png")
     pygame.display.set_icon(icon)
 
     # Background Sound
-
     mixer.music.load("Tetris.mp3")
     mixer.music.set_volume(0.15)
     mixer.music.play(-1)
 
     # Font
-
     score_value = 0
     font = pygame.font.SysFont("arial", 25)
-
     over_font = pygame.font.SysFont("arial", 50)
 
-    # Tetromino
+    # Declare and initialize all tetromino shape with all rotation
+    i_tet = [[0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
+             [0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
+             [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0]]
 
-    I = [[0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
-         [0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0],
-         [0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0]]
+    o_tet = [[0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0]]
 
-    O = [[0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 4, 4, 0, 0, 4, 4, 0, 0, 0, 0, 0]]
+    s_tet = [[0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0],
+             [0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0, 0]]
 
-    S = [[0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 0, 5, 5, 0, 0],
-         [0, 0, 0, 0, 5, 0, 0, 0, 5, 5, 0, 0, 0, 5, 0, 0]]
+    z_tet = [[0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0],
+             [0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0, 0]]
 
-    Z = [[0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 0, 0, 0, 6, 6, 0],
-         [0, 0, 0, 0, 0, 6, 0, 0, 6, 6, 0, 0, 6, 0, 0, 0]]
+    j_tet = [[0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0],
+             [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0]]
 
-    J = [[0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0],
-         [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0]]
+    l_tet = [[0, 0, 0, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 3, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 3, 0, 0, 0],
+             [0, 0, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0]]
 
-    L = [[0, 0, 0, 0, 0, 0, 3, 0, 3, 3, 3, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0, 3, 3, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 0, 3, 0, 0, 0],
-         [0, 0, 0, 0, 3, 3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0]]
+    t_tet = [[0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 7, 0, 0, 0, 0, 0],
+             [0, 0, 0, 0, 0, 7, 0, 0, 0, 7, 7, 0, 0, 7, 0, 0],
+             [0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0, 7, 0, 0],
+             [0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 0, 0, 0, 7, 0, 0]]
 
-    T = [[0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 7, 0, 0, 0, 0, 0],
-         [0, 0, 0, 0, 0, 7, 0, 0, 0, 7, 7, 0, 0, 7, 0, 0],
-         [0, 0, 0, 0, 0, 0, 0, 0, 7, 7, 7, 0, 0, 7, 0, 0],
-         [0, 0, 0, 0, 0, 7, 0, 0, 7, 7, 0, 0, 0, 7, 0, 0]]
-
-    all_tetromino = [I, O, S, Z, J, L, T]
+    all_tetromino = [i_tet, o_tet, s_tet, z_tet, j_tet, l_tet, t_tet]
 
     # Color
 
@@ -166,8 +174,9 @@ def main():
     tet_x = 3
     tet_y = 0
     tetromino_down = pygame.USEREVENT + 1
-    pygame.time.set_timer(tetromino_down, 500)
+    pygame.time.set_timer(tetromino_down, 1000)
     pygame.key.set_repeat(1, 100)
+    number_of_lines = 0
     # get randrom tetromino
 
     next_tetromino = get_new_tetromino(all_tetromino)
@@ -178,7 +187,9 @@ def main():
 
     run = True
     clock = pygame.time.Clock()
+    start_time = pygame.time.get_ticks()
     while run:
+        counting_time = pygame.time.get_ticks() - start_time
         # loop through a list of any keyboard or mouse events
 
         for event in pygame.event.get():
@@ -198,10 +209,13 @@ def main():
                         tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
                         tet_x = 3
                         tet_y = 0
+                        yy = 0
 
                         falling_tetromino = next_tetromino
                         next_tetromino = get_new_tetromino(all_tetromino)
-                        delete_line(grid, COLUMN)
+                        if delete_line(grid, COLUMN):
+                            number_of_lines += 1
+                            score_value += 10
 
                     if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0 and not game_over_bool:
                         game_over_bool = True
@@ -257,6 +271,12 @@ def main():
 
         # draw field
         draw_struture(COLOR, screen, grid, gap, COLUMN, 250, 100, 0, 0)
+
+        # timer
+        show_time(screen, font, counting_time, 80, 100)
+
+        # lines
+        show_number_lines(screen, font, number_of_lines, 80, 150)
 
         # update screen
         pygame.display.update()
