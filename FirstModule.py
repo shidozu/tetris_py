@@ -87,29 +87,36 @@ def tetromino_on_grid(falling_tetromino, grids, column, tet_x, tet_y):
         tet_y - the y-Position of the tetromino
     """
     
-    for n, color in enumerate(falling_tetromino):
-        if color > 0:
-            r = tet_y + n // 4
-            c = tet_x + n % 4
-            grids[r * column + c] = color
+    for n, color_number in enumerate(falling_tetromino):
+        if color_number > 0:
+            # calculate row position
+            column_pos = tet_x + n % 4
+            # calculate column position
+            row_pos = tet_y + n // 4
+            # calculates position for the playing field for the color number
+            grids[row_pos * column + column_pos] = color_number
 
 
-def validity(falling_tetromino, grids, off_tet_x, off_tet_y, row, column):
+def validity(falling_tetromino, grids, tet_x, tet_y, row, column):
     """ Function to check the validity from the tetromino
         falling_tetromino -  current tetromino
         grids - the playfield
-        off_tet_x - the offset for the x-Position of the tetromino
-        off_tet_y - the offset for the y-Position of the tetromino
+        tet_x - the x-Position of the tetromino
+        tet_y - the y-Position of the tetromino
         row - the number of row on the playing field
         column - the number of columns on the playing field
         return - returns true or false
     """
     
-    for n, color in enumerate(falling_tetromino):
-        if color > 0:
-            r = off_tet_y + n // 4
-            c = off_tet_x + n % 4
-            if r >= row or c < 0 or c >= column or grids[r * column + c] > 0:
+    for n, color_number in enumerate(falling_tetromino):
+        if color_number > 0:
+            # calculate row position
+            column_pos = tet_x + n % 4
+            print(column_pos)
+            # calculate column position
+            row_pos = tet_y + n // 4
+            # return false if not valid position
+            if row_pos >= row or column_pos < 0 or column_pos >= column or grids[row_pos * column + column_pos] > 0:
                 return False
     return True
 
@@ -129,9 +136,13 @@ def draw_struture(color, screen, struct, gaps, columns, off_x, off_y, tet_x, tet
 
     for n, color_number in enumerate(struct):
         if color_number > 0:
+            # calculate x position
             x = n % columns * gaps + off_x + gaps * tet_x
+            # calculate y position
             y = n // columns * gaps + off_y + gaps * tet_y
+            # draws a black rectangle block
             pygame.draw.rect(screen, (0, 0, 0), (x, y, gaps, gaps))
+            # draws a smaller colorised rectangle block to see the border
             pygame.draw.rect(screen, color[color_number], (x + 1, y + 1, gaps - 2, gaps - 2))
 
 
@@ -141,15 +152,23 @@ def delete_line(grid, column):
         column - the number of columns on the playing field
         return - returns true or false
     """
+    # block counter
     ig = 0
+    # checks the complete playing field
     for n in range(200):
+        # calculates column position
         x = n % column
+        # if a new column beginn sets block counter 0
         if x == 0:
             ig = 0
+        # if a block found, increase block counter
         if grid[n] != 0:
             ig += 1
+        # if a row is full, delete the row
         if ig == 10:
+            # delete row
             del grid[n - 9:n + 1]
+            # add new row filled with zeros
             for nl in range(column):
                 grid.insert(0, 0)
             return True
