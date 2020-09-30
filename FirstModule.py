@@ -240,7 +240,7 @@ def main():
 
     # Color
 
-    grid = [0] * 10 * 20
+
     deep_sky_blue = (0, 0, 205)
     medium_blue = (0, 191, 255)
     dark_orange = (255, 140, 0)
@@ -255,6 +255,7 @@ def main():
     GAP = WIDTH // COLUMN
     HEIGHT = GAP * ROW
     COLOR = [(0, 0, 0), deep_sky_blue, medium_blue, dark_orange, yellow, lawn_green, red, purple]
+    grid = [0] * 10 * 20
     rotation = 0
     tet_x = 3
     tet_y = 0
@@ -262,10 +263,12 @@ def main():
     tetromino_down = pygame.USEREVENT + 1
     increase_speed = pygame.USEREVENT + 2
     pygame.time.set_timer(tetromino_down, speed)
-    pygame.time.set_timer(increase_speed, 10000)
-    pygame.key.set_repeat(1, 100)
-    number_of_lines = 0 # variable to hold the player's number of cleared lines
-    score_value = 0 # variable to hold the player's score
+    pygame.time.set_timer(increase_speed, 30000)
+    pygame.key.set_repeat(1, 120)
+    # variable to hold the player's number of cleared lines
+    number_of_lines = 0
+    # variable to hold the player's score
+    score_value = 0
 
     # get randrom tetromino
     next_tetromino = get_new_tetromino(all_tetromino)
@@ -308,9 +311,11 @@ def main():
                         falling_tetromino = next_tetromino
                         # assign random tetromino
                         next_tetromino = get_new_tetromino(all_tetromino)
-                        # delete full lines and increase the counter
+                        # temp variable to calculate score
                         number_of_lines_tmp = 0
+                        # delete full lines
                         number_of_lines_tmp += delete_line(grid, COLUMN)
+                        # increase line counter
                         number_of_lines += number_of_lines_tmp
                         # increase the player's score counter
                         score_value += (number_of_lines_tmp * number_of_lines_tmp) * 10
@@ -319,12 +324,15 @@ def main():
                         if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0:
                             # set game over
                             game_over_bool = True
+                            # stop game music
+                            pygame.mixer.music.stop()
                             # reset next tetromino
                             next_tetromino = falling_tetromino
 
             # increase the game speed
             if event.type == increase_speed:
-                speed -= 150
+                if speed != 200:
+                    speed -= 50
                 pygame.time.set_timer(tetromino_down, speed)
 
             if event.type == pygame.KEYDOWN:
@@ -355,7 +363,7 @@ def main():
                         tet_y += 1
 
                 # allows the player to mute/unmute the game music
-                if event.key == pygame.K_m:
+                if event.key == pygame.K_m and not game_over_bool:
                     if mixer.music.get_volume() > 0:
                         mixer.music.set_volume(0)
                     else:
@@ -363,6 +371,8 @@ def main():
 
                 # start new game
                 if event.key == pygame.K_n:
+                    # play game music
+                    pygame.mixer.music.play()
                     # reset playing field
                     grid = [0] * 10 * 20
                     # reset number of lines
