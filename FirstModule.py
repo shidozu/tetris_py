@@ -7,6 +7,9 @@ Created on 17.09.2020
 import pygame
 import random
 from pygame import mixer
+from lib2to3.fixer_util import Number
+from time import sleep
+from pygame.constants import K_ESCAPE
 
 # Functions
 
@@ -350,8 +353,13 @@ def main():
 
         if delete_line(grid, COLUMN):
             number_of_lines += 1 # increase the counter of cleared lines
+            
+            #increase the game speed every 10 cleared lines
+            if (number_of_lines%10)==0:
+                speed -= 150
+                
             score_value += 10 # increase the player's score counter
-            speed -= 50
+            
 
         # field
         pygame.draw.rect(screen, (0, 0, 0), (245, 95, WIDTH + 10, HEIGHT + 10), 3)
