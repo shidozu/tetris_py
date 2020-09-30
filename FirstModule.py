@@ -112,7 +112,6 @@ def validity(falling_tetromino, grids, tet_x, tet_y, row, column):
         if color_number > 0:
             # calculate row position
             column_pos = tet_x + n % 4
-            print(column_pos)
             # calculate column position
             row_pos = tet_y + n // 4
             # return false if not valid position
@@ -249,10 +248,10 @@ def main():
     # Variable
 
     WIDTH, COLUMN, ROW = 300, 10, 20
-    gap = WIDTH // COLUMN
-    height = gap * ROW
+    GAP = WIDTH // COLUMN
+    HEIGHT = GAP * ROW
     COLOR = [(0, 0, 0), deep_sky_blue, medium_blue, dark_orange, yellow, lawn_green, red, purple]
-    yy = 0
+    rotation = 0
     tet_x = 3
     tet_y = 0
     speed = 900
@@ -287,18 +286,18 @@ def main():
 
             if event.type == tetromino_down:
                 # check if valid
-                if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
+                if validity(falling_tetromino[rotation], grid, tet_x, tet_y + 1, ROW, COLUMN):
                     # tetromino one down
                     tet_y += 1
                 else:
                     # check if game over
                     if not game_over_bool:
                         # save current tetromino on playing field
-                        tetromino_on_grid(falling_tetromino[yy], grid, COLUMN, tet_x, tet_y)
+                        tetromino_on_grid(falling_tetromino[rotation], grid, COLUMN, tet_x, tet_y)
                         # put the Tetromino position on start
                         tet_x = 3
                         tet_y = 0
-                        yy = 0
+                        rotation = 0
                         # assign next tetromino
                         falling_tetromino = next_tetromino
                         # assign random tetromino
@@ -306,7 +305,7 @@ def main():
                         # set speed
                         pygame.time.set_timer(tetromino_down, speed)
                         # if tetromino stuck on start position then is game over
-                        if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0:
+                        if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0:
                             # set game over
                             game_over_bool = True
                             # reset next tetromino
@@ -316,27 +315,27 @@ def main():
 
                 # press button up to rotate
                 if event.key == pygame.K_UP and not game_over_bool:
-                    if yy >= 3:
-                        yy = 0
+                    if rotation >= 3:
+                        rotation = 0
                         # if not valid then reset
-                        if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
-                            yy = 3
+                        if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN):
+                            rotation = 3
                     else:
-                        yy += 1
+                        rotation += 1
                         # if not valid then reset
-                        if not validity(falling_tetromino[yy], grid, tet_x, tet_y, ROW, COLUMN):
-                            yy -= 1
+                        if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN):
+                            rotation -= 1
                 # press button left to slide left
                 if event.key == pygame.K_LEFT and not game_over_bool:
-                    if validity(falling_tetromino[yy], grid, tet_x - 1, tet_y, ROW, COLUMN):
+                    if validity(falling_tetromino[rotation], grid, tet_x - 1, tet_y, ROW, COLUMN):
                         tet_x -= 1
                 # press button right to slide right
                 if event.key == pygame.K_RIGHT and not game_over_bool:
-                    if validity(falling_tetromino[yy], grid, tet_x + 1, tet_y, ROW, COLUMN):
+                    if validity(falling_tetromino[rotation], grid, tet_x + 1, tet_y, ROW, COLUMN):
                         tet_x += 1
                 # press button down to slide down
                 if event.key == pygame.K_DOWN and not game_over_bool:
-                    if validity(falling_tetromino[yy], grid, tet_x, tet_y + 1, ROW, COLUMN):
+                    if validity(falling_tetromino[rotation], grid, tet_x, tet_y + 1, ROW, COLUMN):
                         tet_y += 1
 
                 # allows the player to mute/unmute the game music
@@ -355,10 +354,10 @@ def main():
             speed -= 50
 
         # field
-        pygame.draw.rect(screen, (0, 0, 0), (245, 95, WIDTH + 10, height + 10), 3)
+        pygame.draw.rect(screen, (0, 0, 0), (245, 95, WIDTH + 10, HEIGHT + 10), 3)
 
         # show rectangle that contains the next block
-        show_next_block(screen, font, gap)
+        show_next_block(screen, font, GAP)
 
         # display the score
         show_score(screen, font, score_value, 80, 50)
@@ -368,14 +367,14 @@ def main():
             game_over_text(screen, over_font)
 
         # forecast tetromino
-        draw_struture(COLOR, screen, next_tetromino[0], gap, 4, 580, 105, 0, 0)
+        draw_struture(COLOR, screen, next_tetromino[0], GAP, 4, 580, 105, 0, 0)
 
         # draw falling tetromino
         if not game_over_bool:
-            draw_struture(COLOR, screen, falling_tetromino[yy], gap, 4, 250, 100, tet_x, tet_y)
+            draw_struture(COLOR, screen, falling_tetromino[rotation], GAP, 4, 250, 100, tet_x, tet_y)
 
         # draw field
-        draw_struture(COLOR, screen, grid, gap, COLUMN, 250, 100, 0, 0)
+        draw_struture(COLOR, screen, grid, GAP, COLUMN, 250, 100, 0, 0)
 
         # display the timer
         show_time(screen, font, counting_time, 80, 100)
