@@ -240,7 +240,6 @@ def main():
 
     # Color
 
-
     deep_sky_blue = (0, 0, 205)
     medium_blue = (0, 191, 255)
     dark_orange = (255, 140, 0)
@@ -371,8 +370,12 @@ def main():
 
                 # start new game
                 if event.key == pygame.K_n:
-                    # play game music
-                    pygame.mixer.music.play()
+                    # load the music file
+                    mixer.music.load("Tetris.mp3")
+                    # set the music volume to 0.15
+                    mixer.music.set_volume(0.15)
+                    # loop the music 
+                    mixer.music.play(-1)
                     # reset playing field
                     grid = [0] * 10 * 20
                     # reset number of lines
