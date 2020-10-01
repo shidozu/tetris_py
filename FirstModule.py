@@ -1,15 +1,13 @@
-'''
+"""
 Created on 17.09.2020
 
 @author: Lukas Rombach & Renan Uerpmann
-'''
+"""
 
 import pygame
 import random
 from pygame import mixer
-from lib2to3.fixer_util import Number
-from time import sleep
-from pygame.constants import K_ESCAPE
+
 
 # Functions
 
@@ -34,9 +32,10 @@ def show_time(screen, font, running_time, x, y):
         x - the x-position of the timer on the screen
         y - the y-position of the timer on the screen
     """
-    
-    minutes = str(running_time // 60000).zfill(2) # calculate the amount of minutes off the running time
-    seconds = str(int(running_time % 60000 // 1000)).zfill(2) # calculate the amount of seconds off the running time
+    # Calculate the amount of minutes off the running time
+    minutes = str(running_time // 60000).zfill(2)
+    # Calculate the amount of seconds off the running time
+    seconds = str(int(running_time % 60000 // 1000)).zfill(2)
     screen.blit(font.render("Zeit : " + str(minutes) + ":" + str(seconds), True, (0, 0, 0)), (x, y))
 
 
@@ -92,11 +91,11 @@ def tetromino_on_grid(falling_tetromino, grids, column, tet_x, tet_y):
     
     for n, color_number in enumerate(falling_tetromino):
         if color_number > 0:
-            # calculate row position
+            # Calculate column position
             column_pos = tet_x + n % 4
-            # calculate column position
+            # Calculate row position
             row_pos = tet_y + n // 4
-            # calculates position for the playing field for the color number
+            # Calculates position for the playing field for the color number
             grids[row_pos * column + column_pos] = color_number
 
 
@@ -113,11 +112,11 @@ def validity(falling_tetromino, grids, tet_x, tet_y, row, column):
     
     for n, color_number in enumerate(falling_tetromino):
         if color_number > 0:
-            # calculate row position
+            # Calculate column position
             column_pos = tet_x + n % 4
-            # calculate column position
+            # Calculate row position
             row_pos = tet_y + n // 4
-            # return false if not valid position
+            # Return false if not valid position
             if row_pos >= row or column_pos < 0 or column_pos >= column or grids[row_pos * column + column_pos] > 0:
                 return False
     return True
@@ -138,42 +137,44 @@ def draw_struture(color, screen, struct, gaps, columns, off_x, off_y, tet_x, tet
 
     for n, color_number in enumerate(struct):
         if color_number > 0:
-            # calculate x position
+            # Calculate x position
             x = n % columns * gaps + off_x + gaps * tet_x
-            # calculate y position
+            # Calculate y position
             y = n // columns * gaps + off_y + gaps * tet_y
-            # draws a black rectangle block
+            # Draws a black rectangle block
             pygame.draw.rect(screen, (0, 0, 0), (x, y, gaps, gaps))
-            # draws a smaller colorised rectangle block to see the border
+            # Draws a smaller colorised rectangle block to see the border
             pygame.draw.rect(screen, color[color_number], (x + 1, y + 1, gaps - 2, gaps - 2))
 
 
 def delete_line(grid, column):
-    """ Function to delete the full row from the playing field
+    """ Function to delete and count the full row from the playing field
         grid - the playfield
         column - the number of columns on the playing field
-        return - returns true or false
+        return - returns counted lines
     """
-    # block counter
+    # Block counter
     ig = 0
+    # Line counter
     line = 0
-    # checks the complete playing field
+    # Checks the complete playing field
     for n in range(200):
-        # calculates column position
+        # Calculates column position
         x = n % column
-        # if a new column beginn sets block counter 0
+        # If a new line beginns sets block counter 0
         if x == 0:
             ig = 0
-        # if a block found, increase block counter
+        # If a block found, increase block counter
         if grid[n] != 0:
             ig += 1
-        # if a row is full, delete the row
+        # If a line is full, delete the line
         if ig == 10:
-            # delete row
+            # Delete line
             del grid[n - 9:n + 1]
-            # add new row filled with zeros
+            # Add new line filled with zeros
             for nl in range(column):
                 grid.insert(0, 0)
+            # Count line
             line += 1
     return line
 
@@ -187,18 +188,26 @@ def main():
     screen = pygame.display.set_mode((800, 750))
 
     # Title and Icon
-    pygame.display.set_caption("Tetris") # set a caption for the game window
-    icon = pygame.image.load("tetris.png") # load an icon for the game window
-    pygame.display.set_icon(icon) # set the icon 
+    # Set a caption for the game window
+    pygame.display.set_caption("Tetris")
+    # Load an icon for the game window
+    icon = pygame.image.load("tetris.png")
+    # Set the icon
+    pygame.display.set_icon(icon)
 
     # Background Sound
-    mixer.music.load("Tetris.mp3") # load the music file
-    mixer.music.set_volume(0.15) # set the music volume to 0.15
-    mixer.music.play(-1) # loop the music 
+    # Load the music file
+    mixer.music.load("Tetris.mp3")
+    # Set the music volume to 0.15
+    mixer.music.set_volume(0.15)
+    # Loop the music
+    mixer.music.play(-1)
 
     # Font
-    font = pygame.font.SysFont("arial", 25) # font for different screen texts
-    over_font = pygame.font.SysFont("arial", 50) # font for the 'Game over' message
+    # Font for different screen texts
+    font = pygame.font.SysFont("arial", 25)
+    # Font for the 'Game over' message
+    over_font = pygame.font.SysFont("arial", 50)
 
     # Declare and initialize all tetromino shape with all rotation
     i_tet = ((0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0),
@@ -264,71 +273,72 @@ def main():
     pygame.time.set_timer(tetromino_down, speed)
     pygame.time.set_timer(increase_speed, 30000)
     pygame.key.set_repeat(1, 120)
-    # variable to hold the player's number of cleared lines
+    # Variable to hold the player's number of cleared lines
     number_of_lines = 0
-    # variable to hold the player's score
+    # Variable to hold the player's score
     score_value = 0
 
-    # get randrom tetromino
+    # Get randrom tetromino
     next_tetromino = get_new_tetromino(all_tetromino)
     falling_tetromino = get_new_tetromino(all_tetromino)
     game_over_bool = False
 
-    # game-loop
+    # Game-loop
 
     run = True
-    clock = pygame.time.Clock()
+    # Get start time
     start_time = pygame.time.get_ticks()
     while run:
         if not game_over_bool:
+            # if not game over, display time
             counting_time = pygame.time.get_ticks() - start_time
-        # loop through a list of any keyboard or mouse events
+        # Loop through a list of any keyboard or mouse events
 
         for event in pygame.event.get():
 
-            # check for a QUIT event
+            # Check for a QUIT event
             if event.type == pygame.QUIT:
 
                 # End the game loop
                 run = False
 
             if event.type == tetromino_down:
-                # check if valid
+                # Check if valid
                 if validity(falling_tetromino[rotation], grid, tet_x, tet_y + 1, ROW, COLUMN):
-                    # tetromino one down
+                    # Tetromino one down
                     tet_y += 1
                 else:
-                    # check if game over
+                    # Check if game over
                     if not game_over_bool:
-                        # save current tetromino on playing field
+                        # Save current tetromino on playing field
                         tetromino_on_grid(falling_tetromino[rotation], grid, COLUMN, tet_x, tet_y)
-                        # put the Tetromino position on start
+                        # Put the Tetromino position on start
                         tet_x = 3
                         tet_y = 0
                         rotation = 0
-                        # assign next tetromino
+                        # Assign next tetromino
                         falling_tetromino = next_tetromino
-                        # assign random tetromino
+                        # Assign random tetromino
                         next_tetromino = get_new_tetromino(all_tetromino)
-                        # temp variable to calculate score
+                        # Temp variable to calculate score
                         number_of_lines_tmp = 0
-                        # delete full lines
+                        # Delete full lines
                         number_of_lines_tmp += delete_line(grid, COLUMN)
-                        # increase line counter
+                        # Increase line counter
                         number_of_lines += number_of_lines_tmp
-                        # increase the player's score counter
+                        # Increase the player's score counter
                         score_value += (number_of_lines_tmp * number_of_lines_tmp) * 10
 
-                        # if tetromino stuck on start position then is game over
+                        # If tetromino stuck on start position then is game over
                         if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN) and tet_x == 3 and tet_y == 0:
-                            # set game over
+                            # Set game over
                             game_over_bool = True
-                            # stop game music
+                            # Stop game music
                             pygame.mixer.music.stop()
-                            # reset next tetromino
+                            # Reset next tetromino
                             next_tetromino = falling_tetromino
 
-            # increase the game speed
+            # Increase the game speed
             if event.type == increase_speed:
                 if speed != 200:
                     speed -= 50
@@ -336,104 +346,105 @@ def main():
 
             if event.type == pygame.KEYDOWN:
 
-                # press button up to rotate
+                # Press button up to rotate
                 if event.key == pygame.K_UP and not game_over_bool:
                     if rotation >= 3:
                         rotation = 0
-                        # if not valid then reset
+                        # If not valid then reset
                         if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN):
                             rotation = 3
                     else:
                         rotation += 1
-                        # if not valid then reset
+                        # If not valid then reset
                         if not validity(falling_tetromino[rotation], grid, tet_x, tet_y, ROW, COLUMN):
                             rotation -= 1
-                # press button left to slide left
+                # Press button left to slide left
                 if event.key == pygame.K_LEFT and not game_over_bool:
                     if validity(falling_tetromino[rotation], grid, tet_x - 1, tet_y, ROW, COLUMN):
                         tet_x -= 1
-                # press button right to slide right
+                # Press button right to slide right
                 if event.key == pygame.K_RIGHT and not game_over_bool:
                     if validity(falling_tetromino[rotation], grid, tet_x + 1, tet_y, ROW, COLUMN):
                         tet_x += 1
-                # press button down to slide down
+                # Press button down to slide down
                 if event.key == pygame.K_DOWN and not game_over_bool:
                     if validity(falling_tetromino[rotation], grid, tet_x, tet_y + 1, ROW, COLUMN):
                         tet_y += 1
 
-                # allows the player to mute/unmute the game music
+                # Allows the player to mute/unmute the game music
                 if event.key == pygame.K_m and not game_over_bool:
                     if mixer.music.get_volume() > 0:
                         mixer.music.set_volume(0)
                     else:
                         mixer.music.set_volume(0.15)
 
-                # start new game
+                # Start new game
                 if event.key == pygame.K_n:
-                    # load the music file
+                    # Load the music file
                     mixer.music.load("Tetris.mp3")
-                    # set the music volume to 0.15
+                    # Set the music volume to 0.15
                     mixer.music.set_volume(0.15)
-                    # loop the music 
+                    # Loop the music
                     mixer.music.play(-1)
-                    # reset playing field
+                    # Reset playing field
                     grid = [0] * 10 * 20
-                    # reset number of lines
+                    # Reset number of lines
                     number_of_lines = 0
-                    # reset score value
+                    # Reset score value
                     score_value = 0
-                    # reset speed
+                    # Reset speed
                     speed = 900
                     pygame.time.set_timer(tetromino_down, speed)
-                    # reset start time
+                    # Reset start time
                     start_time = pygame.time.get_ticks()
-                    # put the Tetromino position on start
+                    # Put the Tetromino position on start
                     tet_x = 3
                     tet_y = 0
                     rotation = 0
-                    # assign next tetromino
+                    # Assign next tetromino
                     falling_tetromino = next_tetromino
-                    # assign random tetromino
+                    # Assign random tetromino
                     next_tetromino = get_new_tetromino(all_tetromino)
                     game_over_bool = False
 
                 if event.key == pygame.K_ESCAPE:
+                    # Quit game
                     pygame.quit()
                     quit()
 
         # Background color
         screen.fill((241, 241, 241))
 
-        # field
+        # Field
         pygame.draw.rect(screen, (0, 0, 0), (245, 95, WIDTH + 10, HEIGHT + 10), 3)
 
-        # show rectangle that contains the next block
+        # Show rectangle that contains the next block
         show_next_block(screen, font, GAP)
 
-        # display the score
+        # Display the score
         show_score(screen, font, score_value, 80, 50)
 
-        # game over text
+        # Game over text
         if game_over_bool:
             game_over_text(screen, over_font)
 
-        # forecast tetromino
+        # Forecast tetromino
         draw_struture(COLOR, screen, next_tetromino[0], GAP, 4, 580, 105, 0, 0)
 
-        # draw falling tetromino
+        # Draw falling tetromino
         if not game_over_bool:
             draw_struture(COLOR, screen, falling_tetromino[rotation], GAP, 4, 250, 100, tet_x, tet_y)
 
-        # draw field
+        # Draw field
         draw_struture(COLOR, screen, grid, GAP, COLUMN, 250, 100, 0, 0)
 
-        # display the timer
+        # Display the timer
         show_time(screen, font, counting_time, 80, 100)
 
-        # display the amount of cleared lines
+        # Display the amount of cleared lines
         show_number_lines(screen, font, number_of_lines, 80, 150)
 
-        # update screen
+        # Update screen
         pygame.display.update()
 
     pygame.quit()
@@ -441,4 +452,3 @@ def main():
 
 # close game
 main()
-

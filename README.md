@@ -12,8 +12,7 @@ Controls:
 
 Requirements:
 
-Python Version 3.8.5
-
+Python Version 3.8.5    
 Pygame Version 1.9.6
 
 
